@@ -1,0 +1,83 @@
+*{
+  margin: 0;
+  padding: 0;
+}
+#edit{
+  background: yellow;
+}
+#delete{
+  background: red;
+}
+.container{
+  text-align: center;
+  margin-top: 50px;
+}
+.form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.form > input{
+  width: 300px;
+  padding: 15px;
+  outline: none;
+}
+.form > button{
+  padding: 15px;
+  cursor: pointer;
+  width: 150px;
+  outline: none;
+  background: lightcyan;
+  color: black;
+  margin-bottom: 10px;
+  border: none;
+}
+.form > button:hover{
+  background: black;
+  color: white;
+}
+.data-table{
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+}
+.data-table table, tbody, tr, td{
+  border: 2px solid;
+  border-collapse: collapse;
+  padding: 5px;
+}
+.data-table table, thead, tr, th{
+  border: 2px solid;
+  border-collapse: collapse;
+  padding:10px;
+}
+.buttons{
+  display: flex;
+  gap: 3px;
+}
+.buttons button{
+  padding: 9px;
+  cursor: pointer;
+  margin: 5px;
+  border: none;
+  border-radius: 15px;
+  outline: none;
+  background: pink;
+}
+.buttons button:hover{
+    background: black;
+  color: white;
+}
+.updation{
+  display: flex;
+  gap: 12px;
+}
+.updation > button{
+  padding: 15px;
+  cursor: pointer;
+}
+.updation > button:hover{
+ background: black;
+  color: white;
+}
