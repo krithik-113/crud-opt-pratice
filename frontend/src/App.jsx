@@ -17,10 +17,10 @@ const App = () => {
     phone: "",
   });
   const getUsers = useCallback(async (msg = "") => {
-    if(msg) return toast.success(msg)
-    const { data } = await axios.get("/getUsers");
+     const { data } = await axios.get("/getUsers");
     if (data.success) {
       setUsers(data.users)
+      if (msg) toast.success(msg);
     }
   },[])
   const handleInputs = (e) => {

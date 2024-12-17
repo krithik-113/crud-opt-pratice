@@ -4,7 +4,7 @@ import App from './App';
 import axios from "axios"
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-axios.defaults.baseURL = "http://localhost:3007/user/api"
+axios.defaults.baseURL = "https://crud-opt-pratice-backend.onrender.com/user/api";
 root.render(
     <App />
 )
