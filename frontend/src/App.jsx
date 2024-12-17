@@ -1,14 +1,13 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import { v4 as uuidv4 } from "uuid";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 const App = () => {
-  const [users, setUsers] = useState(
-    JSON.parse(localStorage.getItem("users")) || []
-  );
+  const [users, setUsers] = useState([]);
 
   const [updateButton, setUpdateButton] = useState(false);
+  const [id,setId]=useState('')
 
   const [userInfo, setUserInfo] = useState({
     id: 0,
@@ -17,26 +16,34 @@ const App = () => {
     email: "",
     phone: "",
   });
+  const getUsers = useCallback(async (msg = "") => {
+    if(msg) return toast.success(msg)
+    const { data } = await axios.get("/getUsers");
+    if (data.success) {
+      setUsers(data.users)
+    }
+  },[])
   const handleInputs = (e) => {
     const { name, value } = e.target;
     if (name && value) {
       setUserInfo((prev) => ({ ...prev, [name]: value }));
     }
   };
-  const handleUpdateUser = () => {
+  const handleUpdateUser = async () => {
     const { name, age, email, phone } = userInfo;
     if (name && age && email && phone) {
-      if (/^[a-zA-Z0-9_.+\-]+[\x40][a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(email)) {
-        userInfo.id = uuidv4();
-        setUsers((prev) => [...prev, userInfo]);
-        setUserInfo({ name: "", age: "", email: "", phone: "" });
-        toast.success("Record Added");
-
-        localStorage.setItem("users", JSON.stringify(users.reverse()));
-      } else {
-        toast.error('Invalid email')
+      try {
+        const { data } = await axios.post("addUser", userInfo);
+        if (data.success) {
+          setUserInfo({ name: "", age: "", email: "", phone: "" });
+          toast.success(data.message);
+          getUsers()
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        console.log(error.message);
       }
-        
     } else {
       toast.warning("Fields can't be empty...!");
     }
@@ -45,32 +52,41 @@ const App = () => {
   const handleEdit = (user) => {
     setUpdateButton(true);
     setUserInfo(user);
+    setId(user._id)
   };
-  const handleUpdation = () => {
-    const user = users.map((val) => {
-      if (val.id === userInfo.id) {
-        return userInfo;
+  const handleUpdation =async () => {
+    try {
+      const { data } = await axios.put(`/updateUser/${id}`, userInfo);
+      if (data.success) {
+        getUsers(data.message);
+         setUpdateButton(false);
+         setUserInfo({ name: "", age: "", email: "", phone: "" });
+      } else {
+        toast.error(data.message)
       }
-      return val;
-    });
-    setUsers(user);
-    localStorage.setItem("users", JSON.stringify(user));
-    setUpdateButton(false);
-    setUserInfo({ name: "", age: "", email: "", phone: "" });
-    toast.success("Updated Successfully!");
+    } catch (err) {
+      console.log(err.message)
+    }
+    
+   
   };
 
-  const handleDelete = (id) => {
-    const user = users.filter((item) => item.id !== id);
-    setUsers(user);
-    localStorage.setItem("users", JSON.stringify(user));
-    toast.success("Deleted Successfully!");
+  const handleDelete = async (userid) => {
+    const { data } = await axios.delete(`/delete/${userid}`)
+    if (data.success) {
+      getUsers()
+      toast.success("Deleted Successfully!");
+    }
+    
   };
   const cancelUpdation = () => {
     setUserInfo({ name: "", age: "", email: "", phone: "" });
     setUpdateButton(false);
     toast.info("Update Cancel");
   };
+  useEffect(() => {
+  getUsers()
+},[])
   return (
     <div className="container">
       <ToastContainer />
@@ -106,6 +122,7 @@ const App = () => {
           onChange={handleInputs}
           name="phone"
         />
+        <span>{userInfo.phone.toString().length}</span>
         <br />
         {updateButton ? (
           <div className="updation">
@@ -138,7 +155,7 @@ const App = () => {
                   <button id="edit" onClick={() => handleEdit(item)}>
                     Edit
                   </button>
-                  <button id="delete" onClick={() => handleDelete(item.id)}>
+                  <button id="delete" onClick={() => handleDelete(item._id)}>
                     Delete
                   </button>
                 </td>
