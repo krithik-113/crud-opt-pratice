@@ -2,10 +2,11 @@ import React, { useCallback, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import Loading from "./Components/Loading";
 
 const App = () => {
   const [users, setUsers] = useState([]);
-
+  const [isLoading, setIsLoading] = useState(true)
   const [updateButton, setUpdateButton] = useState(false);
   const [id,setId]=useState('')
 
@@ -20,6 +21,7 @@ const App = () => {
      const { data } = await axios.get("/getUsers");
     if (data.success) {
       setUsers(data.users)
+      setIsLoading(false)
       if (msg) toast.success(msg);
     }
   },[])
@@ -30,6 +32,7 @@ const App = () => {
     }
   };
   const handleUpdateUser = async () => {
+    setIsLoading(true)
     const { name, age, email, phone } = userInfo;
     if (name && age && email && phone) {
       try {
@@ -54,11 +57,13 @@ const App = () => {
     setUserInfo(user);
     setId(user._id)
   };
-  const handleUpdation =async () => {
+  const handleUpdation = async () => {
+    setIsLoading(true)
     try {
       const { data } = await axios.put(`/updateUser/${id}`, userInfo);
       if (data.success) {
         getUsers(data.message);
+        setIsLoading(false)
          setUpdateButton(false);
          setUserInfo({ name: "", age: "", email: "", phone: "" });
       } else {
@@ -72,8 +77,10 @@ const App = () => {
   };
 
   const handleDelete = async (userid) => {
+    setIsLoading(true)
     const { data } = await axios.delete(`/delete/${userid}`)
     if (data.success) {
+      setIsLoading(false)
       getUsers()
       toast.success("Deleted Successfully!");
     }
@@ -88,7 +95,7 @@ const App = () => {
   getUsers()
 },[])
   return (
-    <div className="container">
+   isLoading ? <Loading/> : <div className="container">
       <ToastContainer />
       <div className="form">
         <input
